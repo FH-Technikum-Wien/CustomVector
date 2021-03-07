@@ -1,66 +1,196 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
+
 #include "vector.h"
 
 class MyClass
 {
 public:
 	MyClass(int size) { this->size = size; }
-	int size = 0;
+	int size;
 };
 
+std::ostream& operator<<(std::ostream& os, const MyClass& myClass) {
+	return os << "size: " << myClass.size;
+}
+
+// Prints all elements.
+template<typename T>
+void print(Vector<T> vector)
+{
+	for (std::size_t i = 0; i < vector.size(); i++) {
+		std::cout << vector[i] << std::endl;
+	}
+}
+
+void testConstruction();
+void testPushBack();
+void testErase();
+void testEraseBySwap();
+void testReserve();
+void testResize();
+void testAt();
+void testAsArray();
+void testBrackets();
 
 
 int main()
 {
-	std::vector<int> test = std::vector<int>();
-	Vector<int> test2 = Vector<int>();
-
-	test.push_back(0);
-	test.push_back(1);
-	test.push_back(2);
-
-	test.erase(test.begin() + 1);
-
-	test2.push_back(0);
-	test2.push_back(1);
-	test2.push_back(2);
-	test2.push_back(3);
-	test2.push_back(4);
-	test2.push_back(5);
-	test2.push_back(6);
-	test2.push_back(7);
-	test2.push_back(8);
-	test2.push_back(9);
-
-	test2.erase(1);
-
-	int number = test2[0];
-	int number1 = test2[1];
-	int number2 = test2[2];
-
-	test2.erase(3, 5);
-
-	int number3 = test2[3];
-	int number4 = test2[4];
-	int number5 = test2[5];
-
-	test2.resize(22);
-
-	int number20 = test2[20];
-	int number21 = test2[21];
-
-	test2.resize(31, 5);
-
-	int number29 = test2[29];
-	int number30 = test2[30];
-
-	test2.erase_by_swap(0);
-
-
-	Vector<MyClass> noDefaultConstructor = Vector<MyClass>();
-	noDefaultConstructor.push_back(MyClass(15));
+	testConstruction();
+	testPushBack();
+	testErase();
+	testEraseBySwap();
+	testReserve();
+	testResize();
+	testAt();
+	testAsArray();
+	testBrackets();
 
 	return 0;
+}
+
+void testConstruction() 
+{
+	Vector<int> intVector = Vector<int>();
+
+	intVector = Vector<int>(15);
+	intVector = Vector<int>(15, 20);
+
+	Vector<MyClass> noDefault = Vector<MyClass>();
+	Vector<MyClass> noDefault2 = Vector<MyClass>(15, MyClass(10));
+
+	Vector<int> copyConstructor = Vector<int>(intVector);
+
+	Vector<int> copyConstructor2 = copyConstructor;
+}
+
+void testPushBack() 
+{
+	Vector<int> intVector = Vector<int>();
+	intVector.push_back(0);
+	intVector.push_back(1);
+	intVector.push_back(2);
+
+	Vector<MyClass> noDefault = Vector<MyClass>();
+	noDefault.push_back(MyClass(0));
+	noDefault.push_back(MyClass(1));
+	noDefault.push_back(MyClass(2));
+}
+
+void testErase() 
+{
+	Vector<int> intVector = Vector<int>();
+	intVector.push_back(0);
+	intVector.push_back(1);
+	intVector.push_back(2);
+	intVector.push_back(3);
+	intVector.push_back(4);
+	intVector.push_back(5);
+
+	intVector.erase(1,5);
+	intVector.erase(1);
+	intVector.erase(0);
+
+	Vector<MyClass> noDefault = Vector<MyClass>();
+	noDefault.push_back(MyClass(0));
+	noDefault.push_back(MyClass(1));
+	noDefault.push_back(MyClass(2));
+
+	noDefault.erase(1, 3);
+	noDefault.erase(0);
+}
+
+void testEraseBySwap() 
+{
+	Vector<int> intVector = Vector<int>();
+	intVector.push_back(0);
+	intVector.push_back(1);
+	intVector.push_back(2);
+
+	intVector.erase_by_swap(2);
+	intVector.erase_by_swap(0);
+	intVector.erase_by_swap(0);
+
+	Vector<MyClass> noDefault = Vector<MyClass>();
+	noDefault.push_back(MyClass(0));
+	noDefault.erase_by_swap(0);
+}
+
+void testReserve() 
+{
+	Vector<int> intVector = Vector<int>();
+	intVector.reserve(15);
+	intVector.reserve(1);
+	intVector.reserve(30);
+
+	Vector<MyClass> noDefault = Vector<MyClass>();
+	noDefault.reserve(15);
+	noDefault.reserve(1);
+	noDefault.reserve(30);
+}
+
+void testResize() 
+{
+	Vector<int> intVector = Vector<int>();
+	intVector.resize(15);
+	intVector.resize(1);
+	intVector.resize(30);
+
+	intVector.resize(15, 255);
+	intVector.resize(40, 1000);
+}
+
+void testAt() 
+{
+	Vector<int> intVector = Vector<int>();
+	intVector.push_back(0);
+	intVector.push_back(1);
+	intVector.push_back(2);
+
+	int& number = intVector.at(1);
+	number = 20;
+
+	Vector<MyClass> noDefault = Vector<MyClass>();
+	noDefault.push_back(MyClass(0));
+	noDefault.push_back(MyClass(1));
+	noDefault.push_back(MyClass(2));
+
+	MyClass& myClass = noDefault.at(2);
+	myClass.size = 20;
+}
+
+void testAsArray() 
+{
+	Vector<int> intVector = Vector<int>();
+	intVector.push_back(0);
+	intVector.push_back(1);
+	intVector.push_back(2);
+
+	int* asArray = intVector.as_array();
+
+	Vector<MyClass> noDefault = Vector<MyClass>();
+	noDefault.push_back(MyClass(0));
+	noDefault.push_back(MyClass(1));
+	noDefault.push_back(MyClass(2));
+
+	MyClass* noDefaultAsArray = noDefault.as_array();
+}
+
+void testBrackets() 
+{
+	Vector<int> intVector = Vector<int>();
+	intVector.push_back(0);
+	intVector.push_back(1);
+	intVector.push_back(2);
+
+	int number = intVector[2];
+
+	Vector<MyClass> noDefault = Vector<MyClass>();
+	noDefault.push_back(MyClass(0));
+	noDefault.push_back(MyClass(1));
+	noDefault.push_back(MyClass(2));
+
+	MyClass myClass = noDefault[1];
 }

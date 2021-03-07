@@ -1,6 +1,5 @@
 #pragma once
 #include <cstddef> // std::size_t
-#include <iterator>
 
 
 // Copy and swap idiom
@@ -15,22 +14,28 @@ class Vector
 public:
 
 #pragma region Constructors
-	// Default constructor + Constructor with given size
-	Vector(std::size_t size = 0)
+	// Default constructor
+	Vector() {}
+
+	// Constructor with given size
+	Vector(std::size_t size)
 	{
-		reserve(size);
+		resize(size);
 	}
 
 	// Constructor with size and default value
-	Vector(std::size_t size, const T& val) 
+	Vector(std::size_t size, const T& val)
 	{
 		resize(size, val);
 	}
 
 
 	// Copy constructor
-	Vector(const Vector<T>& other) : m_size(other.m_size), m_data(m_size ? new T[m_size]() : nullptr), m_capacity(other.m_capacity)
+	Vector(const Vector<T>& other) : m_size(other.m_size), m_capacity(other.m_capacity)
 	{
+		// Allocate memory for new vector
+		m_data = (T*)malloc(m_capacity * sizeof(T));
+		// Copy data to new vector
 		std::copy(other.m_data, other.m_data + m_size, m_data);
 	}
 
@@ -102,6 +107,9 @@ public:
 		// Move everything after range
 		for (std::size_t i = to; i < oldSize; i++)
 			push_back(oldData[i]);
+
+		// Free up old memory
+		free(oldData);
 	}
 
 	/// <summary>
@@ -112,16 +120,16 @@ public:
 	{
 		erase(index, index + 1);
 	}
-	
+
 	/// <summary>
 	/// Erases the element at the given index by swapping it with the last element.
 	/// This will alter the order but does not require the reallocation of all elements after the index.
 	/// </summary>
 	/// <param name="index">- Index of the element to be removed.</param>
-	void erase_by_swap(std::size_t index) 
+	void erase_by_swap(std::size_t index)
 	{
 		// Simply erase if size is 1
-		if (m_size < 1) 
+		if (m_size < 1)
 		{
 			erase(index);
 			return;
@@ -153,9 +161,11 @@ public:
 		m_capacity = capacity;
 		T* temp = (T*)malloc(m_capacity * sizeof(T));
 		// Move data to new memory
-		std::move(m_data, m_data + m_size, temp);
-		// Free up old allocated memory
-		free(m_data);
+		if (m_data != nullptr) {
+			std::move(m_data, m_data + m_size, temp);
+			// Free up old allocated memory
+			free(m_data);
+		}
 		m_data = temp;
 	}
 
@@ -172,23 +182,24 @@ public:
 			reserve(size);
 
 		// If bigger than current size, add elements with given value
-		if (size > m_size) 
+		if (size > m_size)
 		{
 			std::size_t dif = size - m_size;
 			for (std::size_t i = 0; i < dif; i++)
 				push_back(val);
 		}
-
-		// If smaller than current size, remove (and destroy) elements at the end
-		if (size < m_size)
+		else if (size < m_size) 
+		{
+			// If smaller than current size, remove (and destroy) elements at the end
 			erase(size, m_size);
+		}
 	}
 
 	/// <summary>
 	/// Alters the SIZE of the vector. If bigger, it adds default values of the type. If smaller, erases the last elements.
 	/// </summary>
 	/// <param name="size">- The new size of the vector.</param>
-	void resize(std::size_t size) 
+	void resize(std::size_t size)
 	{
 		resize(size, T());
 	}
@@ -217,11 +228,11 @@ public:
 
 private:
 	// Data/elements.
-	T* m_data;
+	T* m_data = nullptr;
 	// Memory size, expressed in terms of elements (how many elements fit in the current allocated memory).
-	std::size_t m_capacity;
+	std::size_t m_capacity = 0;
 	// Number of elements inside the vector.
-	std::size_t m_size;
+	std::size_t m_size = 0;
 
 
 	/// <summary>
