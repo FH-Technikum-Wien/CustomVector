@@ -66,6 +66,7 @@ public:
 	T& operator[](int i) { return m_data[i]; }
 
 #pragma endregion
+#pragma region Functions
 
 	/// <summary>
 	/// Adds an element at the end of the internal array. If size exceeds current capacity, array will be extended by ~50%.
@@ -188,7 +189,7 @@ public:
 			for (std::size_t i = 0; i < dif; i++)
 				push_back(val);
 		}
-		else if (size < m_size) 
+		else if (size < m_size)
 		{
 			// If smaller than current size, remove (and destroy) elements at the end
 			erase(size, m_size);
@@ -225,15 +226,15 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	inline T* as_array() const { return m_data; }
+#pragma endregion
 
 private:
 	// Data/elements.
 	T* m_data = nullptr;
-	// Memory size, expressed in terms of elements (how many elements fit in the current allocated memory).
-	std::size_t m_capacity = 0;
 	// Number of elements inside the vector.
 	std::size_t m_size = 0;
-
+	// Memory size, expressed in terms of elements (how many elements fit in the current allocated memory).
+	std::size_t m_capacity = 0;
 
 	/// <summary>
 	/// Swaps the data between the given vectors using 'std::swap'.

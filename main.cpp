@@ -1,5 +1,3 @@
-#pragma once
-
 #include <vector>
 #include <iostream>
 
@@ -168,14 +166,14 @@ void testAsArray()
 	intVector.push_back(1);
 	intVector.push_back(2);
 
-	int* asArray = intVector.as_array();
+	intVector.as_array();
 
 	Vector<MyClass> noDefault = Vector<MyClass>();
 	noDefault.push_back(MyClass(0));
 	noDefault.push_back(MyClass(1));
 	noDefault.push_back(MyClass(2));
 
-	MyClass* noDefaultAsArray = noDefault.as_array();
+	noDefault.as_array();
 }
 
 void testBrackets() 
@@ -185,12 +183,12 @@ void testBrackets()
 	intVector.push_back(1);
 	intVector.push_back(2);
 
-	int number = intVector[2];
+	intVector[2];
 
 	Vector<MyClass> noDefault = Vector<MyClass>();
 	noDefault.push_back(MyClass(0));
 	noDefault.push_back(MyClass(1));
 	noDefault.push_back(MyClass(2));
 
-	MyClass myClass = noDefault[1];
+	noDefault[1];
 }
