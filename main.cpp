@@ -91,8 +91,8 @@ void testErase()
 	intVector.push_back(4);
 	intVector.push_back(5);
 
-	intVector.erase(1,5);
 	intVector.erase(1);
+	intVector.erase(1,5);
 	intVector.erase(0);
 
 	Vector<MyClass> noDefault = Vector<MyClass>();

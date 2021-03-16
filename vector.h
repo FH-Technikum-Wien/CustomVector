@@ -33,7 +33,7 @@ public:
 	Vector(const Vector<T>& other) : m_size(other.m_size), m_capacity(other.m_capacity)
 	{
 		// Allocate memory for new vector
-		m_data = static_cast<T*>(malloc(m_capacity * sizeof(T)));
+		m_data = reinterpret_cast<T*>(new char[m_capacity * sizeof(T)]);
 		// Copy data to new vector
 		std::copy(other.m_data, other.m_data + m_size, m_data);
 	}
@@ -48,8 +48,11 @@ public:
 	// Destructor
 	~Vector()
 	{
-		//delete[] m_data;
-		free(m_data);
+		// Call deconstructor for all elements
+		for (std::size_t i = 0; i < m_size; i++)
+			m_data[i].~T();
+		// To delete memory, first convert it back to the type used for allocating the memory
+		delete[] reinterpret_cast<char*>(m_data);
 	}
 
 	// Copy assignment
@@ -81,15 +84,15 @@ public:
 	}
 
 	/// <summary>
-	/// Erases elements between 'from' (inclusive) and 'to' (exclusive)
+	/// Erases elements between 'from' (inclusive) and 'to' (exclusive). Will reallocate memory and close the gap.
 	/// </summary>
 	void erase(std::size_t from, std::size_t to)
 	{
-		// Delete elements
+		// Call deconstructor for elements
 		for (std::size_t i = from; i < to; i++)
 			m_data[i].~T();
 
-		T* temp = static_cast<T*>(malloc(m_capacity * sizeof(T)));
+		T* temp = reinterpret_cast<T*>(new char[m_capacity * sizeof(T)]);
 
 		// Move everything before range to temp
 		std::move(m_data, m_data + from, temp);
@@ -106,12 +109,12 @@ public:
 		for (std::size_t i = to; i < oldSize; i++)
 			push_back(oldData[i]);
 
-		// Free up old memory
-		free(oldData);
+		// Delete and free up old memory
+		delete[] reinterpret_cast<char*>(oldData);
 	}
 
 	/// <summary>
-	/// Erases one element at the given index
+	/// Erases one element at the given index. Will reallocate memory and close the gap.
 	/// </summary>
 	/// <param name="index">- Index of the element to be removed.</param>
 	void erase(std::size_t index)
@@ -126,26 +129,27 @@ public:
 	/// <param name="index">- Index of the element to be removed.</param>
 	void erase_by_swap(std::size_t index)
 	{
-		// Simply erase if size is 1
-		if (m_size <= 1)
-		{
-			erase(index);
-			return;
-		}
+		// Call deconstructor for element 
+		m_data[index].~T();
+		--m_size;
 
-		m_size--;
+		// If no elements remaining, don't swap
+		if (m_size < 1)
+			return;
+
+		// If last element erased, don't swap
+		if (index == m_size)
+			return;
 
 		// Swap elements
 		T temp = m_data[index];
-		m_data[index] = m_data[m_size - 1];
-		m_data[m_size - 1] = temp;
+		m_data[index] = m_data[m_size];
+		m_data[m_size] = temp;
 
-		// Deconstruct last element (which is now the index element)
-		m_data[m_size - 1].~T();
 	}
 
 	/// <summary>
-	/// Allocates new memory by using malloc and moves all elements to it. If given capacity is smaller than current capacity, this does nothing.
+	/// Allocates new memory and moves all elements to it. If given capacity is smaller than current capacity, this does nothing.
 	/// Ensures that the capacity can hold the provided amount of elements.
 	/// </summary>
 	/// <param name="capacity">- The new capacity of the vector (number of elements that fit).</param>
@@ -157,12 +161,12 @@ public:
 
 		// Increase allocated memory
 		m_capacity = capacity;
-		T* temp = static_cast<T*>(malloc(m_capacity * sizeof(T)));
+		T* temp = reinterpret_cast<T*>(new char[m_capacity * sizeof(T)]);
 		// Move data to new memory
 		if (m_data != nullptr) {
 			std::move(m_data, m_data + m_size, temp);
-			// Free up old allocated memory
-			free(m_data);
+			// Delete and free up old allocated memory
+			delete[] reinterpret_cast<char*>(m_data);
 		}
 		m_data = temp;
 	}
