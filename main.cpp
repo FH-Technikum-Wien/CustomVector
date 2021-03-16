@@ -1,12 +1,12 @@
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include "vector.h"
 
 class MyClass
 {
 public:
-	MyClass(int size) { this->size = size; }
+	explicit MyClass(int size) : size(size) { }
 	int size;
 };
 
@@ -56,12 +56,16 @@ void testConstruction()
 	intVector = Vector<int>(15);
 	intVector = Vector<int>(15, 20);
 
+	Vector<int> copyConstructor = Vector<int>(intVector);
+	Vector<int> copyConstructor2 = copyConstructor;
+	Vector<int> moveConstructor = std::move(intVector);
+
 	Vector<MyClass> noDefault = Vector<MyClass>();
 	Vector<MyClass> noDefault2 = Vector<MyClass>(15, MyClass(10));
 
-	Vector<int> copyConstructor = Vector<int>(intVector);
-
-	Vector<int> copyConstructor2 = copyConstructor;
+	Vector<MyClass> noDefault3 = Vector<MyClass>(noDefault2);
+	Vector<MyClass> noDefault4 = noDefault2;
+	Vector<MyClass> noDefault4 = std::move(noDefault2);
 }
 
 void testPushBack() 
@@ -107,12 +111,16 @@ void testEraseBySwap()
 	intVector.push_back(1);
 	intVector.push_back(2);
 
-	intVector.erase_by_swap(2);
+	intVector.erase_by_swap(1);
 	intVector.erase_by_swap(0);
 	intVector.erase_by_swap(0);
 
 	Vector<MyClass> noDefault = Vector<MyClass>();
 	noDefault.push_back(MyClass(0));
+	noDefault.push_back(MyClass(1));
+	noDefault.push_back(MyClass(2));
+	noDefault.erase_by_swap(1);
+	noDefault.erase_by_swap(0);
 	noDefault.erase_by_swap(0);
 }
 
