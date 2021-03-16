@@ -1,2 +1,8 @@
-all: 
-	clang++ main.cpp -Wall -Werror -Wextra -pedantic -g -std=c++14 -o Main
+CC = clang++
+LFLAGS = -std=c++17 -g -Wall -pedantic -Weffc++ -Wextra -Wfatal-errors -Werror
+
+all: main.cpp vector.h
+	${CC} ${LFLAGS} main.cpp -o main
+	
+clean:
+	rm -f main
