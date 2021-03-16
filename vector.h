@@ -13,12 +13,11 @@ class Vector
 {
 public:
 
-#pragma region Constructors
 	// Default constructor
 	Vector() {}
 
 	// Constructor with given size
-	Vector(std::size_t size)
+	explicit Vector(std::size_t size)
 	{
 		resize(size);
 	}
@@ -34,7 +33,7 @@ public:
 	Vector(const Vector<T>& other) : m_size(other.m_size), m_capacity(other.m_capacity)
 	{
 		// Allocate memory for new vector
-		m_data = (T*)malloc(m_capacity * sizeof(T));
+		m_data = static_cast<T*>(malloc(m_capacity * sizeof(T)));
 		// Copy data to new vector
 		std::copy(other.m_data, other.m_data + m_size, m_data);
 	}
@@ -49,11 +48,10 @@ public:
 	// Destructor
 	~Vector()
 	{
-		delete[] m_data;
+		//delete[] m_data;
+		free(m_data);
 	}
-#pragma endregion
 
-#pragma region Operators
 	// Copy assignment
 	// "other" not as reference -> copies and allocates data with copy constructor
 	Vector<T>& operator=(Vector<T> other)
@@ -65,8 +63,7 @@ public:
 	T operator[](int i) const { return m_data[i]; }
 	T& operator[](int i) { return m_data[i]; }
 
-#pragma endregion
-#pragma region Functions
+
 
 	/// <summary>
 	/// Adds an element at the end of the internal array. If size exceeds current capacity, array will be extended by ~50%.
@@ -92,7 +89,7 @@ public:
 		for (std::size_t i = from; i < to; i++)
 			m_data[i].~T();
 
-		T* temp = (T*)malloc(m_capacity * sizeof(T));
+		T* temp = static_cast<T*>(malloc(m_capacity * sizeof(T)));
 
 		// Move everything before range to temp
 		std::move(m_data, m_data + from, temp);
@@ -130,7 +127,7 @@ public:
 	void erase_by_swap(std::size_t index)
 	{
 		// Simply erase if size is 1
-		if (m_size < 1)
+		if (m_size <= 1)
 		{
 			erase(index);
 			return;
@@ -140,10 +137,10 @@ public:
 
 		// Swap elements
 		T temp = m_data[index];
-		m_data[index] = m_data[m_size];
-		m_data[m_size] = temp;
+		m_data[index] = m_data[m_size - 1];
+		m_data[m_size - 1] = temp;
 
-		// Delete last element (which is now the index element)
+		// Deconstruct last element (which is now the index element)
 		m_data[m_size - 1].~T();
 	}
 
@@ -160,7 +157,7 @@ public:
 
 		// Increase allocated memory
 		m_capacity = capacity;
-		T* temp = (T*)malloc(m_capacity * sizeof(T));
+		T* temp = static_cast<T*>(malloc(m_capacity * sizeof(T)));
 		// Move data to new memory
 		if (m_data != nullptr) {
 			std::move(m_data, m_data + m_size, temp);
@@ -226,7 +223,6 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	inline T* as_array() const { return m_data; }
-#pragma endregion
 
 private:
 	// Data/elements.

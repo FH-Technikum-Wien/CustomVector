@@ -65,7 +65,7 @@ void testConstruction()
 
 	Vector<MyClass> noDefault3 = Vector<MyClass>(noDefault2);
 	Vector<MyClass> noDefault4 = noDefault2;
-	Vector<MyClass> noDefault4 = std::move(noDefault2);
+	Vector<MyClass> noDefault5 = std::move(noDefault2);
 }
 
 void testPushBack() 
